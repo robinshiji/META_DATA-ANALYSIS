@@ -9,6 +9,7 @@ from mutagen.wave import WAVE
 import ffmpeg
 import fitz 
 from pdfminer.high_level import extract_text
+from django.views.decorators.cache import never_cache
 from docx import Document
 
 def extract_metadata(file_path):
@@ -102,6 +103,7 @@ def extract_video_metadata(file_path):
 
     return metadata
 
+@never_cache
 def upload_file(request):
     if request.method == 'POST':
         form = FileUploadForm(request.POST, request.FILES)
@@ -120,7 +122,10 @@ def upload_file(request):
 
     return render(request, 'upload.html', {'form': form})
 
+def welcome(request):
+    return render(request,'welcome.html')
 
+@never_cache
 def dashboard(request):
     dash=UploadedFile.objects.all()
     return render(request,'dash.html',{'dash':dash})

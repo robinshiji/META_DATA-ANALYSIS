@@ -1,107 +1,113 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Metadata Analysis </title>
+    <title>Digital Forensic Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         body {
+            background: url('{% static "images/2.jpg" %}') no-repeat center center/cover;
+            color: #C9D1D9;
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
+            text-align: center;
         }
-        /* Navigation Bar */
-        .navbar {
-            background-color: #000000;
-            overflow: hidden;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .overlay {
+            background: rgba(0, 0, 0, 0.7);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 95%;
         }
-        .navbar .logo {
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-        }
-        .navbar a:hover {
-            background-color: #575757;
-        }
-        /* Container Styling */
         .container {
-            width: 60%;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            margin-top: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+            margin-top: 10%;
         }
-        h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 15px;
-        }
-        form {
-            text-align: center;
+        .hero-icon {
+            font-size: 80px;
+            color: #8E2DE2;
             margin-bottom: 20px;
         }
-        button {
-            background-color: #4CAF50;
-            color: white;
+        .btn-custom {
+            background: linear-gradient(135deg, #8E2DE2, #4A00E0);
             border: none;
-            padding: 12px 18px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 15px;
+            text-decoration: none;
+            border-radius: 10px;
+            display: inline-block;
+            margin: 10px;
             transition: 0.3s;
         }
-        button:hover {
-            background-color: #45a049;
+        .btn-custom:hover {
+            background: linear-gradient(135deg, #4A00E0, #8E2DE2);
+            transform: scale(1.05);
         }
-        /* Table Styling */
+        #typing-text {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+        #typing-text::after {
+            content: "|";
+            animation: blink 0.7s infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .metadata-table {
+            width: 80%;
+            margin: 20px auto;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        table, th, td {
+        th, td {
             border: 1px solid #ddd;
             padding: 10px;
             text-align: left;
         }
         th {
-            background-color: #333;
+            background-color: #8E2DE2;
             color: white;
-        }
-        td {
-            background-color: #f9f9f9;
         }
     </style>
 </head>
 <body>
-
-    <div class="navbar">
-        <div class="logo">Metadata Analysis</div>
-        <a href="{% url 'dashboard' %}">Dashboard</a>
-    </div>
-
+    <div class="overlay"></div>
     <div class="container">
-        <h2>Upload a File</h2>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Upload</button>
-        </form>
+        <i class="fas fa-user-secret hero-icon"></i>
+        <h1 id="typing-text"></h1>
+        <div>
+            
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="file-upload" class="btn-custom">
+        <i class="fas fa-upload"></i> Choose File
+    </label>
+    <input type="file" id="file-upload" name="file" style="display: none;">
+    <button type="submit" class="btn-custom"><i class="fas fa-cloud-upload-alt"></i>Submit</button>
+</form>
 
-        {% if metadata %}
+            <a href="{% url 'dashboard' %}" class="btn-custom"><i class="fas fa-folder-open"></i> View Files</a>
+        </div>
+    </div>
+    
+    {% if metadata %}
+    <div class="metadata-table">
         <h3>Metadata for: {{ file_name }}</h3>
         <table>
             <tr>
@@ -110,13 +116,54 @@
             </tr>
             {% for key, value in metadata.items %}
             <tr>
-                <td><strong>{{ key }}</strong></td>
+                <td>{{ key }}</td>
                 <td>{{ value }}</td>
             </tr>
             {% endfor %}
         </table>
-        {% endif %}
     </div>
+    {% endif %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const texts = [
+                "Welcome to the Digital Forensic Hub",
+                "Analyze Metadata with Precision",
+                "Uncover Hidden Data in Files & Media"
+            ];
+            let textIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            const speed = 100;
+            const delay = 1500;
+
+            function typeEffect() {
+                const currentText = texts[textIndex];
+                let displayText = currentText.substring(0, charIndex);
+                document.getElementById("typing-text").innerHTML = displayText;
+
+                if (!isDeleting && charIndex < currentText.length) {
+                    charIndex++;
+                    setTimeout(typeEffect, speed);
+                } else if (isDeleting && charIndex > 0) {
+                    charIndex--;
+                    setTimeout(typeEffect, speed / 2);
+                } else {
+                    if (!isDeleting) {
+                        isDeleting = true;
+                        setTimeout(typeEffect, delay);
+                    } else {
+                        isDeleting = false;
+                        textIndex = (textIndex + 1) % texts.length;
+                        setTimeout(typeEffect, speed);
+                    }
+                }
+            }
+
+            typeEffect();
+        });
+    </script>
+
 
 </body>
 </html>

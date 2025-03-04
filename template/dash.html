@@ -1,29 +1,50 @@
 <style>
+    body {
+        font-family: 'Courier New', Courier, monospace;
+        background-color: #0f0f0f;
+        color: #00ffcc;
+        margin: 0;
+        padding: 20px;
+    }
+
     .file-container {
         display: flex;
         flex-wrap: wrap;
         gap: 20px;
         padding: 20px;
+        justify-content: center;
     }
+
     .file-card {
-        background: white;
+        background: #1a1a1a;
         padding: 15px;
         border-radius: 10px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0px 0px 10px rgba(0, 255, 204, 0.5);
         text-align: center;
         max-width: 300px;
+        transition: transform 0.3s, box-shadow 0.3s;
     }
+
+    .file-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 0px 15px rgba(0, 255, 204, 0.8);
+    }
+
     .file-card img, 
     .file-card video {
         width: 100%;
         border-radius: 5px;
+        border: 1px solid #00ffcc;
     }
+
     .file-card p {
         font-weight: bold;
         margin: 10px 0 5px;
+        color: #00ffcc;
     }
-    .delete-btn {
-        background-color: #d9534f;
+
+    .delete-btn, .download-btn {
+        background-color: #ff0033;
         color: white;
         border: none;
         padding: 8px 15px;
@@ -31,35 +52,68 @@
         cursor: pointer;
         border-radius: 5px;
         transition: 0.3s;
+        margin-top: 10px;
     }
+
+    .download-btn {
+        background-color: #0066ff;
+    }
+
     .delete-btn:hover {
-        background-color: #c9302c;
+        background-color: #cc0022;
+        box-shadow: 0px 0px 10px rgba(255, 0, 51, 0.8);
     }
+
+    .download-btn:hover {
+        background-color: #0044cc;
+        box-shadow: 0px 0px 10px rgba(0, 102, 255, 0.8);
+    }
+
+    .metadata {
+        font-size: 12px;
+        margin-top: 10px;
+        color: #66ffcc;
+        text-align: left;
+    }
+
+    .metadata span {
+        color: #ffcc00;
+    }
+
 </style>
 
 <div class="file-container">
     {% for file in dash %}
         <div class="file-card">
+            
             {% if file.file.name|lower|slice:"-3:" == "jpg" or file.file.name|lower|slice:"-3:" == "png" or file.file.name|lower|slice:"-4:" == "jpeg" %}
-                <p>📷 Image File:</p>
+                <p>📷 <b>Image File:</b></p>
                 <img src="{{ file.file.url }}" alt="Uploaded Image">
             
             {% elif file.file.name|lower|slice:"-3:" == "mp3" or file.file.name|lower|slice:"-3:" == "wav" %}
-                <p>🎵 Audio File:</p>
+                <p>🎵 <b>Audio File:</b></p>
                 <audio controls>
                     <source src="{{ file.file.url }}" type="audio/{{ file.file.name|slice:"-3:" }}">
                     Your browser does not support the audio tag.
                 </audio>
 
             {% elif file.file.name|lower|slice:"-3:" == "mp4" or file.file.name|lower|slice:"-3:" == "avi" or file.file.name|lower|slice:"-3:" == "mkv" %}
-                <p>🎥 Video File:</p>
+                <p>🎥 <b>Video File:</b></p>
                 <video controls>
                     <source src="{{ file.file.url }}" type="video/{{ file.file.name|slice:"-3:" }}">
                     Your browser does not support the video tag.
                 </video>
             {% endif %}
 
-            <!-- Delete Button -->
+            <!-- File Metadata -->
+            <div class="metadata">
+                <p><span>File Name:</span> {{ file.file.name }}</p>
+                <p><span>File Size:</span> {{ file.file.size|filesizeformat }}</p>
+                <p><span>Uploaded:</span> {{ file.uploaded_at }}</p>
+            </div>
+
+            <!-- Download & Delete Buttons -->
+            <a href="{{ file.file.url }}" download class="download-btn">⬇ Download</a>
             <form action="{% url 'delete_file' file.id %}" method="POST">
                 {% csrf_token %}
                 <button type="submit" class="delete-btn">❌ Delete</button>
