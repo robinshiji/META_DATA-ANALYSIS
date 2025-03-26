@@ -13,7 +13,7 @@ from django.views.decorators.cache import never_cache
 from docx import Document
 from pymediainfo import MediaInfo
 
-@never_cache
+
 def extract_metadata(file_path):
     metadata = {}
     _, file_extension = os.path.splitext(file_path)
@@ -30,7 +30,7 @@ def extract_metadata(file_path):
 
     return metadata
 
-@never_cache
+
 def extract_image_metadata(file_path):
     metadata = {}
     with Image.open(file_path) as img:
@@ -49,7 +49,7 @@ def extract_image_metadata(file_path):
     return metadata
 
 
-@never_cache
+
 def extract_document_metadata(file_path):
     metadata = {}
     _, file_extension = os.path.splitext(file_path)
@@ -71,7 +71,7 @@ def extract_document_metadata(file_path):
 
     return metadata
 
-@never_cache
+
 def extract_audio_metadata(file_path, file_extension):
     metadata = {}
 
@@ -91,7 +91,7 @@ def extract_audio_metadata(file_path, file_extension):
     return metadata
 
 
-@never_cache
+
 def extract_video_metadata(file_path):
     media_info = MediaInfo.parse(file_path)
     metadata = {}
@@ -113,7 +113,7 @@ def extract_video_metadata(file_path):
     return metadata
 
 ###########################################
-@never_cache
+
 def upload_file(request):
     if request.method == 'POST':
         form = FileUploadForm(request.POST, request.FILES)
