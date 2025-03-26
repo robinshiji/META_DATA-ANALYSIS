@@ -11,7 +11,9 @@ import fitz
 from pdfminer.high_level import extract_text
 from django.views.decorators.cache import never_cache
 from docx import Document
+from pymediainfo import MediaInfo
 
+@never_cache
 def extract_metadata(file_path):
     metadata = {}
     _, file_extension = os.path.splitext(file_path)
@@ -28,6 +30,7 @@ def extract_metadata(file_path):
 
     return metadata
 
+@never_cache
 def extract_image_metadata(file_path):
     metadata = {}
     with Image.open(file_path) as img:
@@ -46,6 +49,7 @@ def extract_image_metadata(file_path):
     return metadata
 
 
+@never_cache
 def extract_document_metadata(file_path):
     metadata = {}
     _, file_extension = os.path.splitext(file_path)
@@ -67,6 +71,7 @@ def extract_document_metadata(file_path):
 
     return metadata
 
+@never_cache
 def extract_audio_metadata(file_path, file_extension):
     metadata = {}
 
@@ -85,24 +90,29 @@ def extract_audio_metadata(file_path, file_extension):
 
     return metadata
 
+
+@never_cache
 def extract_video_metadata(file_path):
+    media_info = MediaInfo.parse(file_path)
     metadata = {}
 
-    try:
-        probe = ffmpeg.probe(file_path)
-        video_info = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
+    for track in media_info.tracks:
+        if track.track_type == "Video":
+            metadata["Format"] = track.format
+            metadata["Duration"] = track.duration
+            metadata["Width"] = track.width
+            metadata["Height"] = track.height
+            metadata["Frame Rate"] = track.frame_rate
+            metadata["Bit Rate"] = track.bit_rate
 
-        if video_info:
-            metadata["Resolution"] = f"{video_info['width']}x{video_info['height']}"
-            metadata["Codec"] = video_info['codec_name']
-            metadata["Duration"] = round(float(probe['format']['duration']), 2)  # Convert to float
-        else:
-            metadata["Error"] = "No video stream found"
-    except Exception as e:
-        metadata["Error"] = str(e)  # Handle missing or unreadable metadata
+        if track.track_type == "Audio":
+            metadata["Audio Format"] = track.format
+            metadata["Audio Channels"] = track.channel_s
+            metadata["Audio Sample Rate"] = track.sampling_rate
 
     return metadata
 
+###########################################
 @never_cache
 def upload_file(request):
     if request.method == 'POST':
@@ -130,6 +140,7 @@ def dashboard(request):
     dash=UploadedFile.objects.all()
     return render(request,'dash.html',{'dash':dash})
 
+@never_cache
 def delete_file(request, file_id):
     file_obj = get_object_or_404(UploadedFile, id=file_id)
 

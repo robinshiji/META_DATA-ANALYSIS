@@ -5,6 +5,25 @@
         color: #00ffcc;
         margin: 0;
         padding: 20px;
+        text-align: center;
+    }
+
+    .home-btn {
+        background-color: #ffcc00;
+        color: #000;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-bottom: 20px;
+        display: inline-block;
+    }
+
+    .home-btn:hover {
+        background-color: #e6b800;
+        box-shadow: 0px 0px 10px rgba(255, 204, 0, 0.8);
     }
 
     .file-container {
@@ -81,6 +100,9 @@
     }
 
 </style>
+
+<!-- Home Button -->
+<a href="{% url 'upload_file' %}" class="home-btn">🏠 Go to Home</a>
 
 <div class="file-container">
     {% for file in dash %}
